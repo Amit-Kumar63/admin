@@ -19,7 +19,7 @@ const ImageUploadButton = ({ setFiles }) => {
         const { status } = info.file;
         if (status === 'done') {
           message.success(`${info.file.name} file uploaded locally.`);
-          setFiles(info.fileList); // 
+          setFiles(info.fileList.map(file => file.originFileObj));
         } else if (status === 'error') {
           message.error(`${info.file.name} file upload failed.`);
         }

@@ -1,11 +1,13 @@
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Input from '../components/Input'
 import SelectField from '../components/SelectField'
 import SwitchButton from '../components/Switch'
 import ImageUploadButton from '../components/ImageUploadButton'
 import TagInput from '../components/TagInput'
 import SubmitButton from '../components/SubmitButton'
+import axios from 'axios'
+import toast from 'react-hot-toast'
 
 const UploadImage = () => {
     const [title, setTitle] = useState('')
@@ -18,9 +20,46 @@ const UploadImage = () => {
     const [files, setFiles] = useState([])
     const [tags, setTags] = useState([])
 
-    const onSubmit = () => {
-      console.log({title, description, oldPrice, price, category, subCategory, isFeature, files, tags})
+    const [isLoading, setIsLoading] = useState(false)
+    const [responseData, setResponseData] = useState({})
+    const [buttonDisable, setButtonDisable] = useState(true)
+
+    const onSubmit = async() => {
+      setIsLoading(true)
+      const data = new FormData()
+      data.append('title', title)
+      data.append('discription', description)
+      data.append('oldPrice', oldPrice)
+      data.append('price', price)
+      data.append('category', category)
+      data.append('subCategory', subCategory)
+      data.append('isFeature', isFeature)
+      data.append('tags', tags)
+
+      files.forEach(file => data.append('files', file));
+      try {
+        const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/upload`, data)
+        setResponseData(res)
+      } catch (error) {
+        setIsLoading(false)
+        toast.error(error.message || 'Something went wrong')
+      }
     }
+    useEffect(() => {
+      if (responseData.status === 201) {
+        setIsLoading(false)
+        toast.success(responseData?.data.message || 'Image uploaded successfully')
+      }
+    }, [responseData])
+
+    useEffect(() => {
+      if (title && description && oldPrice && price && category && subCategory && files.length > 0) {
+        setButtonDisable(false)
+      } else {
+        setButtonDisable(true)
+      }
+    }, [title, description, oldPrice, price, category, subCategory, isFeature, tags, files])
+
   return (
     <div className='w-full py-4 px-5 '>
        <div className='flex gap-5 mt-5'>
@@ -41,7 +80,7 @@ const UploadImage = () => {
        </div>
        <div className='flex my-8 justify-center gap-20 items-center'>
         <ImageUploadButton setFiles={setFiles}/>
-       <SubmitButton text={'Submit'} onClick={onSubmit}/>
+       <SubmitButton text={'Submit'} onClick={onSubmit} isLoading={isLoading} isDisabled={buttonDisable}/>
        </div>
     </div>
   )
