@@ -8,6 +8,7 @@ import TagInput from '../components/TagInput'
 import SubmitButton from '../components/SubmitButton'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import { international, indian } from '../../consts/categories'
 
 const UploadImage = () => {
     const [title, setTitle] = useState('')
@@ -16,7 +17,7 @@ const UploadImage = () => {
     const [price, setPrice] = useState('')
     const [category, setCategory] = useState('')
     const [subCategory, setSubCategory] = useState('')
-    const [isFeature, setIsFeature] = useState(false)
+    const [isFeatured, setIsFeatured] = useState(false)
     const [files, setFiles] = useState([])
     const [tags, setTags] = useState([])
 
@@ -28,12 +29,12 @@ const UploadImage = () => {
       setIsLoading(true)
       const data = new FormData()
       data.append('title', title)
-      data.append('discription', description)
+      data.append('description', description)
       data.append('oldPrice', oldPrice)
       data.append('price', price)
       data.append('category', category)
       data.append('subCategory', subCategory)
-      data.append('isFeature', isFeature)
+      data.append('isFeatured', isFeatured)
       data.append('tags', tags)
 
       files.forEach(file => data.append('files', file));
@@ -58,7 +59,7 @@ const UploadImage = () => {
       } else {
         setButtonDisable(true)
       }
-    }, [title, description, oldPrice, price, category, subCategory, isFeature, tags, files])
+    }, [title, description, oldPrice, price, category, subCategory, isFeatured, tags, files])
 
   return (
     <div className='w-full py-4 px-5 '>
@@ -72,8 +73,8 @@ const UploadImage = () => {
        </div>
        <div className='flex gap-5 mb-8'>
        <SelectField value={category} label={'Category'} handleChange={(e) => setCategory(e.target.value)} disabledValue={'Category'} menuItem={['Indian', 'International']}/>
-       <SelectField value={subCategory} label={'Sub category'} handleChange={(e) => setSubCategory(e.target.value)} disabledValue={'Sub category'} menuItem={['Holi', 'Diwali']}/>
-        <SwitchButton name={'isFeature'} labelText={'isFeature'} value={isFeature} handleChange={(e) => setIsFeature(e.target.checked)}/>
+       <SelectField value={subCategory} label={'Sub category'} handleChange={(e) => setSubCategory(e.target.value)} disabledValue={'Sub category'} menuItem={category === 'Indian' ? indian : international}/>
+        <SwitchButton name={'isFeatured'} labelText={'isFeatured'} value={isFeatured} handleChange={(e) => setIsFeatured(e.target.checked)}/>
        </div>
        <div className='flex gap-5'>
        <TagInput tags={tags} handleChange={(tag)=> setTags(tag)}/>
